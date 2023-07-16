@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7212ce4a49cf14fc181b057a81595673, type: 3}
+  m_Name: World
+  m_EditorClassIdentifier: 
+  levels:
+  - {fileID: 11400000, guid: 2fa617892c2b3419d8c7931a5a669c06, type: 2}
+  - {fileID: 11400000, guid: 354f34031ace448f1988bb0611e8f29d, type: 2}
+  - {fileID: 11400000, guid: 646fa2a951d3447219cf97578eabaedb, type: 2}
+  - {fileID: 11400000, guid: a914b48b4b85c47f59075dd38bec18b4, type: 2}
+  - {fileID: 11400000, guid: 9eaacf44a0a904e1d8a37614eb9043ae, type: 2}
