@@ -56,29 +56,33 @@ public class LevelSelectManager : MonoBehaviour
         }
         else
         {
-            int lvl = 11;
-            string url;
+            DirectoryInfo d = new DirectoryInfo(Application.persistentDataPath);
+            FileInfo[] Files = d.GetFiles();
 
-            while (lvl != 26)
+            if (Files.Length < 5) // This is here for dummy windows files share bug...
             {
-                string level_name = lvl.ToString();
-                // url string changes after level 15
-                if (lvl <= 15)
+                int lvl = 11;
+                string url;
+
+                while (lvl != 26)
                 {
-                    url = "https://row-match.s3.amazonaws.com/levels/RM_A" + level_name;
+                    string level_name = lvl.ToString();
+                    // url string changes after level 15
+                    if (lvl <= 15)
+                    {
+                        url = "https://row-match.s3.amazonaws.com/levels/RM_A" + level_name;
+                    }
+                    else
+                    {
+                        url = "https://row-match.s3.amazonaws.com/levels/RM_B" + (lvl - 15).ToString();
+                    }
+                    StartCoroutine(DownloadFile(url, level_name));
+                    //Debug.Log(level_name);
+                    lvl++;
                 }
-                else
-                {
-                    url = "https://row-match.s3.amazonaws.com/levels/RM_B" + (lvl - 15).ToString();
-                }
-                StartCoroutine(DownloadFile(url, level_name));
-                //Debug.Log(level_name);
-                lvl++;
             }
         }
         // ***********************************
-
-
     }
 
     // Download file unit. To be called iteratively in co-routine in start method.
