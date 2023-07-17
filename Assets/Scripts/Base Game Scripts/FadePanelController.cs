@@ -9,7 +9,7 @@ public class FadePanelController : MonoBehaviour
     public Animator panelAnimator;
     public Animator gameInfoAnimator;
 
-
+    // Triggers animations of panel
     public void OKButton()
     {
         if (panelAnimator != null && gameInfoAnimator != null)

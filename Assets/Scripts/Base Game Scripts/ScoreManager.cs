@@ -10,10 +10,13 @@ using TMPro;
 public class ScoreManager : MonoBehaviour
 {
 
+    [Header("Score Variables")]
     public TMP_Text scoreText;
     public TMP_Text highScoreText;
     public int score;
 
+
+    // Score dictionary to see corresponding scores of dots
     private IDictionary<string, int> scoreDictionary = new Dictionary<string, int>()
     {
         {"Red Dot",100 },
@@ -22,18 +25,11 @@ public class ScoreManager : MonoBehaviour
         {"Yellow Dot",250 },
     };
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
 
     // Update is called once per frame
     void Update()
     {
         scoreText.text = score.ToString();
-        //CheckHighestScore();
     }
 
 
@@ -52,6 +48,8 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
+    // This playerprefs is for some front end operations, actual player data is stored at application persistent storage
+    // and managed by GameData object.
 
     // Call if necessary from end game manager
     public void UpdateHighestScore()

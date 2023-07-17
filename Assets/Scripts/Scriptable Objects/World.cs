@@ -10,31 +10,28 @@ using System.Linq;
 [CreateAssetMenu (fileName = "World", menuName = "World")]
 public class World : ScriptableObject
 {
+    // World has levels to feed the scene...
     public Level[] levels;
 
 
+    // Fill the available levels to world
     public void fillLevelsToWorld() 
     {
       
-        // Fill the available levels to world
-       
         DirectoryInfo d = new DirectoryInfo(Application.persistentDataPath);
-        //"*.txt"
         FileInfo[] Files = d.GetFiles();
 
         this.levels = new Level[25];
-        firstTenLevelsStatic();
+        firstTenLevelsStatic(); // First ten levels should always be there when game starts
 
         for (int i = 0; i < Files.Length; i++)
         {
             if (Files[i].Name != "player.dat" && Files[i].Name != ".DS_Store")
             {
 
-            Debug.Log(Application.persistentDataPath + Files[i].Name);
-
             using (StreamReader reader = new StreamReader(Application.persistentDataPath + "/" + Files[i].Name))
                 {
-                Debug.Log(Application.persistentDataPath + Files[i].Name);
+                //Debug.Log(Application.persistentDataPath + Files[i].Name);
                 string level_no = "";
                 string _width = "";
                 string _height = "";
@@ -42,7 +39,7 @@ public class World : ScriptableObject
                 string dots = "";
                 string line;
                 int line_ct = 0;
-                Debug.Log("File Read Phase started!!!");
+                //Debug.Log("File Read Phase started!!!");
                     while ((line = reader.ReadLine()) != null)
                     {
                         if (line_ct == 0)
@@ -68,9 +65,8 @@ public class World : ScriptableObject
                             if (int.Parse(level_no) > 10 && int.Parse(level_no) <= 25)
                             {
                                 dots = line.Substring(6);
-                                Debug.Log(level_no + " " + _width + " " + _height + " " + _maxMoves);
+                                //Debug.Log(level_no + " " + _width + " " + _height + " " + _maxMoves);
                                 this.levels[int.Parse(level_no) - 1] = (Level.CreateInstance(int.Parse(level_no), int.Parse(_width), int.Parse(_height), int.Parse(_maxMoves), dots));
-                                //string[] dotsList = dots.Split(',');
                             }
                         }
                     line_ct++;
@@ -82,6 +78,13 @@ public class World : ScriptableObject
 
 
 
+
+
+
+
+
+
+    // Static first ten levels
     public void firstTenLevelsStatic()
     {
         this.levels[0] = Level.CreateInstance(1, 5, 7, 20, "b,b,y,b,b,g,y,g,r,b,y,g,r,g,g,b,b,g,b,y,r,r,g,g,y,g,g,y,y,b,y,b,b,y,b");

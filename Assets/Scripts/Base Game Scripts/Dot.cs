@@ -18,36 +18,37 @@ public enum DotState
 
 public class Dot : MonoBehaviour
 {
-    // Variable declarations
-    [Header("Variables")]
+    // Variable declarations for angle detection
     private Vector2 firstTouch;
     private Vector2 lastTouch;
+    private float swipeAngle = 0;
+    private float swipeResist = 1f; // To check a swipe is big enough to increase player experience.
 
+    // State information to see if its matched or normal
     private DotState dotState = DotState.normal;
 
+    // Used in board class
     public bool isMatched = false;
 
-    public float swipeAngle = 0;
-    public float swipeResist = 1f; // To check a swipe is big enough to increase player experience.
+    // Index variables for dot 
+    private int row;
+    private int column;
+    private int targetX;
+    private int targetY;
 
-    public int row;
-    public int column;
-    public int targetX;
-    public int targetY;
-    
     private Board board;
     private GameObject otherDot;
     private Vector2 tempTargetPos;
 
-    //public Sprite mSprite;
-
+    // Manager objects for performing appropriate operations
     private ScoreManager scoreManager;
     private EndGameManager egManager;
 
+    // Matched rows to obtain little boards for deadlock detection
     private static bool[] matchedRows;
 
+    // Count of deadlocked little boards in that specific time
     private int deadBoards = 0;
-
 
 
     // Start is called before the first frame update
@@ -79,12 +80,7 @@ public class Dot : MonoBehaviour
         // Displays matches on the scene
         if (isMatched)
         {
-            this.dotState = DotState.matched;
-
-            //SpriteRenderer matchSprite = this.GetComponent<Dot>().GetComponent<SpriteRenderer>();
-            //matchSprite.sprite = mSprite;
-
-            //matchSprite.color = new Color(0f, 0f, 0f,0f);
+            this.dotState = DotState.matched; // Flag the dot object to be matched, i.e cannot be moved anymore.
         }
 
         // Target positions set for change operation
@@ -95,9 +91,8 @@ public class Dot : MonoBehaviour
         if (Mathf.Abs(targetX - transform.position.x) > .1) // Move towards the target if a swipe is big enough
         {
             tempTargetPos = new Vector2(targetX, transform.position.y);
-            //transform.position = Vector2.Lerp(transform.position, tempTargetPos, .4f);
 
-            if (transform != null)
+            if (transform != null && tempTargetPos != null)
             {
                 transform.DOMove(tempTargetPos, .5f);
             }
@@ -114,9 +109,8 @@ public class Dot : MonoBehaviour
         if (Mathf.Abs(targetY - transform.position.y) > .1) // Move towards the target if a swipe is big enough
         {
             tempTargetPos = new Vector2(transform.position.x, targetY);
-            //transform.position = Vector2.Lerp(transform.position, tempTargetPos, .4f);
 
-            if (transform != null)
+            if (transform != null && tempTargetPos != null)
             {
                 transform.DOMove(tempTargetPos, .5f);
             }
@@ -181,8 +175,6 @@ public class Dot : MonoBehaviour
             // If row match happened in the row of actual swiped dot
             if (rowMatchAtMovedDot)
             {
-
-                //this.dotState = DotState.matched;
                 scoreManager.IncreaseScore(tag);
 
                 // Initialize all dots in that row as matched
@@ -192,13 +184,10 @@ public class Dot : MonoBehaviour
                 }
 
                 matchedRows[targetY] = true;
-
-                //bool[] array = { false, false, true, false, false, true, false };
-                List<List<int>> gaps = FindGaps(matchedRows); // list donduruyo
+                List<List<int>> gaps = FindGaps(matchedRows); // This is a list of little boards, example: bounded lines between matched lines.
 
                 foreach (List<int> gap in gaps)
                 {
-
                     if (DeadlockDetector(gap))
                     {
                         deadBoards++;
@@ -206,25 +195,18 @@ public class Dot : MonoBehaviour
 
                 }
 
-                Debug.Log(deadBoards);
-                Debug.Log(gaps.Count);
-
                 if (deadBoards == gaps.Count)
                 {
                     egManager.isDeadlock = true;
                 }
 
-                //Debug.Log(targetX);
-                //Debug.Log(targetY);
-                Debug.Log("ROWMATCH @ " + row + " MOVED DOT!!");
+                //Debug.Log("ROWMATCH @ " + row + " MOVED DOT!!");
             }
 
 
             // If row match happened in the row of other dot swapped with
             if (rowMatchAtOtherDot)
             {
-
-                //otherDot.GetComponent<Dot>().dotState = DotState.matched;
                 scoreManager.IncreaseScore(otherDot.tag);
 
                 // Initialize all dots in that row as matched
@@ -234,18 +216,14 @@ public class Dot : MonoBehaviour
                 }
 
                 matchedRows[otherDotsRow] = true;
-
-                //bool[] array = { false, false, true, false, false, true, false };
-                List<List<int>> gaps = FindGaps(matchedRows); // list donduruyo
+                List<List<int>> gaps = FindGaps(matchedRows); // This is a list of little boards, example: bounded lines between matched lines.
 
                 foreach (List<int> gap in gaps)
                 {
-
                     if (DeadlockDetector(gap))
                     {
                         deadBoards++;
                     }
-
                 }
 
                 if (deadBoards == gaps.Count)
@@ -253,13 +231,7 @@ public class Dot : MonoBehaviour
                     egManager.isDeadlock = true;
                 }
 
-                Debug.Log(deadBoards);
-                Debug.Log(gaps.Count);
-
-                //Debug.Log(otherDotsRow);
-                //int otherDotscolumn = otherDot.GetComponent<Dot>().column;
-                //Debug.Log(otherDotscolumn);
-                Debug.Log("ROWMATCH @ " + otherDotsRow + " OTHER DOT!!");
+                //Debug.Log("ROWMATCH @ " + otherDotsRow + " OTHER DOT!!");
             }
 
             // Release the reference to other dot since the movement is done
@@ -269,11 +241,11 @@ public class Dot : MonoBehaviour
         // Reset the game state to playable.
         yield return new WaitForSeconds(.2f);
         board.currentState = GameState.move;
-        egManager.IsLevelFinished();
+        egManager.IsLevelFinished(); // Check if level is finished everytime this movement and checks finished.
     }
 
 
-    // Function that looks for deadlock between matched and given y value.
+    // Function that looks for deadlock in a unit board, i.e this can be complete board or little board with bounds etc.
     private bool DeadlockDetector(List<int> gap)
     {
         int red_ct = 0;
@@ -306,7 +278,6 @@ public class Dot : MonoBehaviour
 
         if (red_ct < board.width && blue_ct < board.width && yellow_ct < board.width && green_ct < board.width)
         {
-            //egManager.isDeadlock = true;
             return true;
         }
         else
@@ -317,182 +288,10 @@ public class Dot : MonoBehaviour
             green_ct = 0;
             return false;
         }
-
-        /*
-        // Edge case
-        if (targetY == 0)
-        {
-
-            // Upper check
-            for (int i = targetY+1; i < boardY; i++)
-            {
-                for (int j = 0; j < board.width; j++)
-                {
-                    if (board.allDots[j, i].tag == "Blue Dot")
-                    {
-                        blue_ct++;
-                    }
-                    else if (board.allDots[j, i].tag == "Red Dot")
-                    {
-                        red_ct++;
-                    }
-                    else if (board.allDots[j, i].tag == "Green Dot")
-                    {
-                        green_ct++;
-                    }
-                    else if (board.allDots[j, i].tag == "Yellow Dot")
-                    {
-                        yellow_ct++;
-                    }
-                }
-            }
-            if (red_ct < board.width && blue_ct < board.width && yellow_ct < board.width && green_ct < board.width)
-            {
-                logicalMoveLeftUpper = false;
-                egManager.isDeadlock = true;
-            }
-            else
-            {
-                red_ct = 0;
-                blue_ct = 0;
-                yellow_ct = 0;
-                green_ct = 0;
-            }
-
-        }
-
-        // Other edge case 
-        else if (targetY == board.height - 1)
-        {
-            // Lower check
-            for (int i = boardY; i < targetY; i++)
-            {
-                for (int j = 0; j < board.width; j++)
-                {
-                    if (board.allDots[j, i].tag == "Blue Dot")
-                    {
-                        blue_ct++;
-                    }
-                    else if (board.allDots[j, i].tag == "Red Dot")
-                    {
-                        red_ct++;
-                    }
-                    else if (board.allDots[j, i].tag == "Green Dot")
-                    {
-                        green_ct++;
-                    }
-                    else if (board.allDots[j, i].tag == "Yellow Dot")
-                    {
-                        yellow_ct++;
-                    }
-                }
-            }
-            if (red_ct < board.width && blue_ct < board.width && yellow_ct < board.width && green_ct < board.width)
-            {
-                logicalMoveLeftUpper = false;
-                egManager.isDeadlock = true;
-            }
-            else
-            {
-                red_ct = 0;
-                blue_ct = 0;
-                yellow_ct = 0;
-                green_ct = 0;
-            }
-
-        }
-
-        // Normal Case
-        else
-        {
-            // Upper check
-            for (int i = targetY+1; i < boardY; i++)
-            {
-                for (int j = 0; j < board.width; j++)
-                {
-                    if (board.allDots[j, i].tag == "Blue Dot")
-                    {
-                        blue_ct++;
-                    }
-                    else if (board.allDots[j, i].tag == "Red Dot")
-                    {
-                        red_ct++;
-                    }
-                    else if (board.allDots[j, i].tag == "Green Dot")
-                    {
-                        green_ct++;
-                    }
-                    else if (board.allDots[j, i].tag == "Yellow Dot")
-                    {
-                        yellow_ct++;
-                    }
-                }
-            }
-            if (red_ct < board.width && blue_ct < board.width && yellow_ct < board.width && green_ct < board.width)
-            {
-                logicalMoveLeftUpper = false;
-                red_ct = 0;
-                blue_ct = 0;
-                yellow_ct = 0;
-                green_ct = 0;
-            }
-
-            else
-            {
-                Debug.Log(red_ct + " " + blue_ct + " " + yellow_ct + " " + green_ct);
-                red_ct = 0;
-                blue_ct = 0;
-                yellow_ct = 0;
-                green_ct = 0;
-            }
-
-            // Lower check
-            for (int i = boardY; i < targetY; i++)
-            {
-                for (int j = 0; j < board.width; j++)
-                {
-                    if (board.allDots[j, i].tag == "Blue Dot")
-                    {
-                        blue_ct++;
-                    }
-                    else if (board.allDots[j, i].tag == "Red Dot")
-                    {
-                        red_ct++;
-                    }
-                    else if (board.allDots[j, i].tag == "Green Dot")
-                    {
-                        green_ct++;
-                    }
-                    else if (board.allDots[j, i].tag == "Yellow Dot")
-                    {
-                        yellow_ct++;
-                    }
-                }
-            }
-            if (red_ct < board.width && blue_ct < board.width && yellow_ct < board.width && green_ct < board.width)
-            {
-                logicalMoveLeftLower = false;
-                red_ct = 0;
-                blue_ct = 0;
-                yellow_ct = 0;
-                green_ct = 0;
-            }
-            else
-            {
-                red_ct = 0;
-                blue_ct = 0;
-                yellow_ct = 0;
-                green_ct = 0;
-            }
-            if (!logicalMoveLeftUpper && !logicalMoveLeftLower)
-            {
-                egManager.isDeadlock = true;
-            }
-        }
-        */
     }
 
 
+    // Gap finder function => usage: if matched rows are [false , true, false] => Gap(unit little board) is index 1, which has a single row.
     public static List<List<int>> FindGaps(bool[] arr)
     {
         List<List<int>> gaps = new List<List<int>>();
@@ -648,96 +447,3 @@ public class Dot : MonoBehaviour
         StartCoroutine(CheckMoveCo());
     }
 }
-
-
-
-/*
-                int red_ct = 0;
-                int blue_ct = 0;
-                int yellow_ct = 0;
-                int green_ct = 0;
-
-                // Normal case
-                if (targetX != 0 || targetX != board.height - 1)
-                {
-                    // upper grid
-                    for (int i = 0; i < targetX; i++)
-                    {
-                        if () { }
-                        red_ct++;
-                        blue_ct++;
-                        yellow_ct++;
-                        green_ct++;
-                    }
-                    if (red_ct < board.width && blue_ct < board.width && yellow_ct < board.width && green_ct < board.width)
-                    {
-                        egManager.logicalMoveLeftLower = false;
-                    }
-                    else
-                    {
-                        red_ct = 0;
-                        blue_ct = 0;
-                        yellow_ct = 0;
-                        green_ct = 0;
-                    }
-                    // lower grid
-                    for (int i = targetX; i < board.height; i++)
-                    {
-                        red_ct++;
-                        blue_ct++;
-                        yellow_ct++;
-                        green_ct++;
-                    }
-                    if (red_ct < board.width && blue_ct < board.width && yellow_ct < board.width && green_ct < board.width)
-                    {
-                        egManager.logicalMoveLeftLower = false;
-                    }
-                    else
-                    {
-                        red_ct = 0;
-                        blue_ct = 0;
-                        yellow_ct = 0;
-                        green_ct = 0;
-                    }
-                }
-
-                // Lower edge case
-                else if (targetX == 0)
-                {
-
-                    // upper grid
-                    for (int i = 0; i < targetX; i++)
-                    {
-                        if (red_ct < board.width && blue_ct < board.width && yellow_ct < board.width && green_ct < board.width)
-                        {
-                            egManager.logicalMoveLeftUpper = false;
-                        }
-                        else
-                        {
-                            red_ct = 0;
-                            blue_ct = 0;
-                            yellow_ct = 0;
-                            green_ct = 0;
-                        }
-                    }
-                }
-
-                // upper edge case
-                else if (targetX == board.height - 1)
-                {
-                    // lower grid
-                    for (int i = targetX; i < board.height; i++)
-                    {
-                        if (red_ct < board.width && blue_ct < board.width && yellow_ct < board.width && green_ct < board.width)
-                        {
-                            egManager.logicalMoveLeftLower = false;
-                        }
-                        else
-                        {
-                            red_ct = 0;
-                            blue_ct = 0;
-                            yellow_ct = 0;
-                            green_ct = 0;
-                        }
-                    }
-                }*/

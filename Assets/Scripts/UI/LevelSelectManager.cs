@@ -17,21 +17,19 @@ public class LevelSelectManager : MonoBehaviour
     public Sprite activeSprite;
     public Sprite lockedSprite;
 
-    private Image buttonImage;
-    private Button myButton;
 
     [Header("Level UI Stuff")]
     public TMP_Text levelText;
     public TMP_Text scoreText;
-    private int highScore;
-
     public int level;
+
+
+    private int highScore;
+    private Image buttonImage;
+    private Button myButton;
 
     // This object is used to load the data
     private GameData gameData;
-
-    // Available levels will be filled to board's world
-    //private Board board;
 
 
     // Start is called before the first frame update
@@ -41,11 +39,6 @@ public class LevelSelectManager : MonoBehaviour
         buttonImage = GetComponent<Image>();
         myButton = GetComponent<Button>();
         gameData = FindObjectOfType<GameData>();
-        //board = FindObjectOfType<Board>();
-
-        //fillLevelsToWorld();
-
-
         myButton.onClick.AddListener(OpenLevel);
 
         loadData();
@@ -94,10 +87,9 @@ public class LevelSelectManager : MonoBehaviour
         var uwr = new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET);
         //Debug.Log(uwr.url.ToString());
         string path = Path.Combine(Application.persistentDataPath + "/", level_name);
-        Debug.Log(path);
+        //Debug.Log(path);
         if(!Directory.Exists(path))
         {
-
             // This try catch is only for avoiding a dummy error on windows.
             try
             {
@@ -116,6 +108,8 @@ public class LevelSelectManager : MonoBehaviour
         
     }
 
+
+    // Loads data from saved data
     void loadData()
     {
         if (gameData != null)
@@ -149,6 +143,7 @@ public class LevelSelectManager : MonoBehaviour
     }
 
 
+    // Decides sprites wheter it should be locked or not
     void DecideSprite()
     {
         if (isActive)
@@ -167,6 +162,7 @@ public class LevelSelectManager : MonoBehaviour
         }
     }
 
+    // Directs to level scene and sets the current level of the user
     public void OpenLevel()
     {
         PlayerPrefs.SetInt("CurrentLevel",level-1);

@@ -5,11 +5,13 @@ using UnityEngine;
 public class PanelSelectManager : MonoBehaviour
 {
 
-    public GameObject[] panels;
-    public GameObject currentPanel;
+    [Header("Panel Stuff")]
+    public GameObject[] panels; // Level panels, i.e pages of levels.
+    public GameObject currentPanel; // Current panel to start the level select popup from where user left.
     public int page;
-    private GameData gameData;
     public int currentLevel = 0;
+
+    private GameData gameData;
 
     // Start is called before the first frame update
     void Start()
@@ -56,11 +58,5 @@ public class PanelSelectManager : MonoBehaviour
             currentPanel = panels[page];
             currentPanel.SetActive(true);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

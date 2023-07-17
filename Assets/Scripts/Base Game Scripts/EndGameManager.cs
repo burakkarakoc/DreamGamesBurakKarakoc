@@ -17,11 +17,17 @@ public class EndGameManager : MonoBehaviour
     private Board board;
 
     private BackToMainScene back;
+
+    // Panel is given as parameter in the editor
     public GameObject celebrationPanel;
 
-    // will be updated in dot class to check whether a logical move left to match a row to finish the game here in end game manager.
-    public bool isDeadlock = false;
+    // Game data of the user for that level to set win conditions
+    private GameData gameData;
+    private int highestScoreBefore = 0;
 
+    // Two conditions for finish a game;
+    // isDeadLock will be updated in dot class to check whether a logical move left to match a row to finish the game here in end game manager.
+    public bool isDeadlock = false;
     private bool lastMove = false;
 
 
@@ -31,8 +37,9 @@ public class EndGameManager : MonoBehaviour
         board = FindObjectOfType<Board>();
         smanager = FindObjectOfType<ScoreManager>();
         back = FindObjectOfType<BackToMainScene>();
-
+        gameData = FindObjectOfType<GameData>();
         SetMaxMove();
+        loadHighScoreBefore();
     }
 
     // Update is called once per frame
@@ -59,18 +66,35 @@ public class EndGameManager : MonoBehaviour
         }
     }
 
+    void loadHighScoreBefore()
+    {
+
+        if (gameData.saveData != null)
+        {
+            // Decide if level is active from saved data
+            if (gameData.saveData.isActives.Length >= board.level)
+            {
+                if (gameData.saveData.isActives[board.level] == true)
+                {
+                    highestScoreBefore = gameData.saveData.highScores[board.level ];
+                }
+                else
+                {
+                    highestScoreBefore = 0;
+                }
+            }
+        }
+    }
+
 
     public void IsLevelFinished()
     {
         // If moves ran out, or there are no logical move left, finish the game in an appropriate way.
         if (lastMove || isDeadlock)
-        //if (lastMove)
-
         {
-            //PlayerPrefs.GetInt("HighScore", 0)
-            if (smanager.score > 0)
+            
+            if (smanager.score > highestScoreBefore)
             {
-
                 // Update high score
                 smanager.UpdateHighestScore();
 
@@ -83,16 +107,17 @@ public class EndGameManager : MonoBehaviour
 
             // If level losed
             else
-            {
-                back.LoseOK();
+            { 
                 Debug.Log("Game Lose");
                 Debug.Log(smanager.score);
                 Debug.Log("***********");
                 Debug.Log("Pass the highest score of: " + PlayerPrefs.GetInt("HighScore", 0));
                 board.currentState = GameState.lose;
+                back.LoseOK();
             }
         }
     }
+
 
     // Should be reached from dot class and decremented by 1 if a move happens
     public void DecrementMove()

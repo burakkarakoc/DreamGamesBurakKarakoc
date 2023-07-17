@@ -36,7 +36,6 @@ public class Board : MonoBehaviour
     public int width; // Width of the board
     public int height; // Height of the board
 
-    //private EndGameManager endGameManager;
     private int maxMoves;
 
     [Header("Prefabs")]
@@ -44,6 +43,7 @@ public class Board : MonoBehaviour
     private BackgroundTile[,] allTiles;
 
 
+    [Header("Dots information")]
     public GameObject[] dots;
     public GameObject[,] allDots;
     private int[,] dotsArr;
@@ -55,6 +55,8 @@ public class Board : MonoBehaviour
         {
             level = PlayerPrefs.GetInt("CurrentLevel");
         }
+
+        // If there is a world object for board, then perform required initializations
         if (world != null)
         {
             world.fillLevelsToWorld();
@@ -72,13 +74,13 @@ public class Board : MonoBehaviour
         }
     }
 
+
     // Start is called before the first frame update
     void Start()
     {
         allTiles = new BackgroundTile[width, height];
         allDots = new GameObject[width, height];
-
-        Setup();
+        Setup(); // Sets up the board
     }
 
     // Setup process for setting up the board
@@ -128,12 +130,15 @@ public class Board : MonoBehaviour
                 {
                     SpriteRenderer matchSprite = allDots[i, j].GetComponent<Dot>().GetComponent<SpriteRenderer>();
                     matchSprite.sprite = mSprite;
-                    matchSprite.color = new Color(0, 1, 1, 1);
+                    matchSprite.color = new Color(0, 1, 1, 1); // Nice Cyan color for matched line items.
                 }
             }
         }
     }
 }
+
+
+// This function is used at random dot generation without any matches, I didn't delete it since its useful in a game like Royal Match
 //    private bool MatchesAt(int column, int row, GameObject piece)
 //    /*
 //     * 

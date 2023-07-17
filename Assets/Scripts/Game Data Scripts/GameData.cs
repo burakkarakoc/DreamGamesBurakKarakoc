@@ -13,8 +13,6 @@ public class SaveData
 {
     public bool[] isActives;
     public int[] highScores;
-
-
 }
 
 
@@ -27,10 +25,6 @@ public class GameData : MonoBehaviour
 
     // needs to be public to be serialized by formatter
     public SaveData saveData;
-
-
-
-
 
 
     // Start is called before the first frame update
@@ -46,15 +40,17 @@ public class GameData : MonoBehaviour
             Destroy(this.gameObject);
         }
 
+        // Load data if possible
         Load();
 
+        // If not all levels are there, || saveData.isActives.Length != 10 condition could be added but it does not effect 
+        // any process in the game so I set it in advance.
         if (saveData.isActives.Length != 25)
         {
             saveData.isActives = new bool[25];
             saveData.highScores = new int[25];
             saveData.isActives[0] = true;
         }
-
     }
 
 
@@ -65,7 +61,6 @@ public class GameData : MonoBehaviour
 
         // Create a route from the program to file
         FileStream file = File.Open(Application.persistentDataPath + "/player.dat", FileMode.Create);
-
 
         // Create a copy save data
         SaveData data = new SaveData();
@@ -78,8 +73,6 @@ public class GameData : MonoBehaviour
         file.Close();
 
         Debug.Log("Saved");
-
-
     }
 
     private void OnDisable()
@@ -87,16 +80,21 @@ public class GameData : MonoBehaviour
         Save();
     }
 
+    // Loads player data if possible
     public void Load()
     {
         if (File.Exists(Application.persistentDataPath + "/player.dat"))
         {
             // Create a binary formatter
             BinaryFormatter formatter = new BinaryFormatter();
+
+            // Open data file
             FileStream file = File.Open(Application.persistentDataPath + "/player.dat", FileMode.Open);
 
+            // Add it to saveData object
             saveData = formatter.Deserialize(file) as SaveData;
 
+            // Close the Filestream
             file.Close();
 
             Debug.Log("Loaded");

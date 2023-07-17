@@ -11,17 +11,18 @@ using System;
 public class Level : ScriptableObject
 {
 
-    //[Header("Board Dimensions")]
+    // Especially I let them public to see the world at runtime at editor for correctness of levels.
+    [Header("Level infos")]
     public int width;
     public int height;
     public int level_no;
-
-    //[Header("Dots for Level")]
-    private string inputString;
-    public int[,] dots2D;
-
-    [Header("Max Moves")]
     public int maxMoves;
+
+    [Header("Dots for Level")]
+    private string inputString;
+
+    // Used in board class to setup the board for the corresponding levels dots
+    public int[,] dots2D;
 
 
     // Default constructor with parameters
@@ -44,6 +45,7 @@ public class Level : ScriptableObject
     }
 
 
+    // Those indexes are how I placed a dot in board object, you can check from editor
     private IDictionary<string, int> candyDictionary = new Dictionary<string, int>()
     {
         {"b",0 },

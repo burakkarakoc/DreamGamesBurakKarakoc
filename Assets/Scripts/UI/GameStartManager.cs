@@ -15,6 +15,7 @@ public class GameStartManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Do not open starting page each time a level finishes
         if (initDone)
         {
             playButton = GetComponent<Button>();
@@ -30,6 +31,7 @@ public class GameStartManager : MonoBehaviour
         
     }
 
+    // Invoked when play button clicked
     private void Play()
     {
         initDone = false;
