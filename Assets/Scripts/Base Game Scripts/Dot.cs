@@ -31,10 +31,10 @@ public class Dot : MonoBehaviour
     public bool isMatched = false;
 
     // Index variables for dot 
-    private int row;
-    private int column;
-    private int targetX;
-    private int targetY;
+    public int row;
+    public int column;
+    public int targetX;
+    public int targetY;
 
     private Board board;
     private GameObject otherDot;
